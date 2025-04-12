@@ -24,6 +24,350 @@ export type Database = {
         }
         Relationships: []
       }
+      bands: {
+        Row: {
+          id: string
+          name: string
+          created_at: string
+          created_by: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          created_at?: string
+          created_by: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          created_at?: string
+          created_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bands_created_by_fkey"
+            columns: ["created_by"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      band_members: {
+        Row: {
+          id: string
+          band_id: string
+          user_id: string
+          role: string
+          joined_at: string
+        }
+        Insert: {
+          id?: string
+          band_id: string
+          user_id: string
+          role: string
+          joined_at?: string
+        }
+        Update: {
+          id?: string
+          band_id?: string
+          user_id?: string
+          role?: string
+          joined_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "band_members_band_id_fkey"
+            columns: ["band_id"]
+            referencedRelation: "bands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "band_members_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      tasks: {
+        Row: {
+          id: string
+          band_id: string
+          title: string
+          assignee: string
+          completed: boolean
+          dueDate: string | null
+          created_at: string
+          created_by: string
+        }
+        Insert: {
+          id?: string
+          band_id: string
+          title: string
+          assignee: string
+          completed?: boolean
+          dueDate?: string | null
+          created_at?: string
+          created_by: string
+        }
+        Update: {
+          id?: string
+          band_id?: string
+          title?: string
+          assignee?: string
+          completed?: boolean
+          dueDate?: string | null
+          created_at?: string
+          created_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_band_id_fkey"
+            columns: ["band_id"]
+            referencedRelation: "bands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_created_by_fkey"
+            columns: ["created_by"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      events: {
+        Row: {
+          id: string
+          band_id: string
+          title: string
+          description: string | null
+          start_date: string
+          end_date: string | null
+          location: string | null
+          event_type: string
+          created_at: string
+          created_by: string
+        }
+        Insert: {
+          id?: string
+          band_id: string
+          title: string
+          description?: string | null
+          start_date: string
+          end_date?: string | null
+          location?: string | null
+          event_type: string
+          created_at?: string
+          created_by: string
+        }
+        Update: {
+          id?: string
+          band_id?: string
+          title?: string
+          description?: string | null
+          start_date?: string
+          end_date?: string | null
+          location?: string | null
+          event_type?: string
+          created_at?: string
+          created_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_band_id_fkey"
+            columns: ["band_id"]
+            referencedRelation: "bands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_created_by_fkey"
+            columns: ["created_by"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      notes: {
+        Row: {
+          id: string
+          band_id: string
+          title: string
+          content: string
+          category: string | null
+          created_at: string
+          created_by: string
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          band_id: string
+          title: string
+          content: string
+          category?: string | null
+          created_at?: string
+          created_by: string
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          band_id?: string
+          title?: string
+          content?: string
+          category?: string | null
+          created_at?: string
+          created_by?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_band_id_fkey"
+            columns: ["band_id"]
+            referencedRelation: "bands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notes_created_by_fkey"
+            columns: ["created_by"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      budget_items: {
+        Row: {
+          id: string
+          band_id: string
+          description: string
+          amount: number
+          date: string
+          category: string
+          is_income: boolean
+          created_at: string
+          created_by: string
+        }
+        Insert: {
+          id?: string
+          band_id: string
+          description: string
+          amount: number
+          date: string
+          category: string
+          is_income: boolean
+          created_at?: string
+          created_by: string
+        }
+        Update: {
+          id?: string
+          band_id?: string
+          description?: string
+          amount?: number
+          date?: string
+          category?: string
+          is_income?: boolean
+          created_at?: string
+          created_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_items_band_id_fkey"
+            columns: ["band_id"]
+            referencedRelation: "bands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_items_created_by_fkey"
+            columns: ["created_by"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      setlists: {
+        Row: {
+          id: string
+          band_id: string
+          name: string
+          event_id: string | null
+          created_at: string
+          created_by: string
+        }
+        Insert: {
+          id?: string
+          band_id: string
+          name: string
+          event_id?: string | null
+          created_at?: string
+          created_by: string
+        }
+        Update: {
+          id?: string
+          band_id?: string
+          name?: string
+          event_id?: string | null
+          created_at?: string
+          created_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "setlists_band_id_fkey"
+            columns: ["band_id"]
+            referencedRelation: "bands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "setlists_event_id_fkey"
+            columns: ["event_id"]
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "setlists_created_by_fkey"
+            columns: ["created_by"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      setlist_songs: {
+        Row: {
+          id: string
+          setlist_id: string
+          title: string
+          artist: string | null
+          duration: number | null
+          order: number
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          setlist_id: string
+          title: string
+          artist?: string | null
+          duration?: number | null
+          order: number
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          setlist_id?: string
+          title?: string
+          artist?: string | null
+          duration?: number | null
+          order?: number
+          notes?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "setlist_songs_setlist_id_fkey"
+            columns: ["setlist_id"]
+            referencedRelation: "setlists"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

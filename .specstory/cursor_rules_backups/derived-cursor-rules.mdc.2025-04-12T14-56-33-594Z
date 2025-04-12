@@ -1,0 +1,70 @@
+
+## PROJECT OVERVIEW
+
+Band Brain Hub: A collaborative web application for band management.  Focus on rapid deployment, excellent UX/UI, and seamless mobile experience.  Real-time synchronization and offline support are critical.
+
+## CODE STYLE
+
+Adhere to standard TypeScript and React best practices.  Maintain consistency in styling using Tailwind CSS.
+
+## FOLDER ORGANIZATION
+
+- `.cursor`
+- `.specstory`
+- `public`
+- `src`
+    - `components`
+    - `contexts`
+    - `hooks`
+    - `integrations`
+    - `lib`
+    - `pages`
+- `supabase`
+
+
+## TECH STACK
+
+- React
+- TypeScript
+- Supabase
+- shadcn/ui
+- Tailwind CSS
+- IndexedDB (for offline support)
+- uuid
+
+## PROJECT-SPECIFIC STANDARDS
+
+- Prioritize intuitive UX/UI design, considering the needs of non-technical band members.
+- All components must integrate with the Supabase database.
+- Real-time updates are mandatory using Supabase subscriptions.
+- Offline functionality is required using IndexedDB or a similar solution.
+- Comprehensive error handling and loading states are essential.
+- Database schema defined in `src/integrations/supabase/types.ts`
+
+## WORKFLOW & RELEASE RULES
+
+(To be defined based on project evolution.  Consider Agile methodologies.)
+
+## REFERENCE EXAMPLES
+
+(To be added as the project progresses)
+
+## PROJECT DOCUMENTATION & CONTEXT SYSTEM
+
+(To be defined based on project evolution.  Consider using MDX for documentation within the codebase.)
+
+## DEBUGGING
+
+(To be defined based on project evolution)
+
+## FINAL DOs AND DON'Ts
+
+- **DO:**  Prioritize data persistence, real-time collaboration, offline capability, and UX refinements in that order.
+- **DO:**  Design with an intuitive UX/UI that is accessible to non-technical users.
+- **DO:**  Ensure consistent error handling and loading states throughout the application.
+- **DO:**  Use Supabase subscriptions for real-time updates.
+- **DO:** Implement offline support using IndexedDB or a similar technology.
+- **DON'T:**  Rely on local state for data persistence.
+- **DO:** Use `useSupabaseQuery` hook for all data fetching and manipulation.
+- **DO:** Manage band selection using `BandContext`.
+- **DO:** Manage synchronization using `SyncContext`.

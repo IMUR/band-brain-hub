@@ -1,9 +1,5 @@
-
 import React from 'react';
-import { Music, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useAuth } from '@/contexts/AuthContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,52 +7,84 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSync } from '@/contexts/SyncContext';
+import { LogOut, User, RefreshCw, CloudOff, CheckCircle2 } from 'lucide-react';
+import BandSelector from './BandSelector';
 
-const Header = ({ bandName }: { bandName: string }) => {
-  const isMobile = useIsMobile();
+const Header = () => {
   const { user, signOut } = useAuth();
-  const { toast } = useToast();
+  const { isOnline, isSyncing, lastSyncTime, forceSync } = useSync();
   
-  const handleSignOut = async () => {
-    await signOut();
+  const formatSyncTime = () => {
+    if (!lastSyncTime) return 'Never';
+    
+    // Format the last sync time
+    return new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    }).format(lastSyncTime);
   };
   
   return (
-    <div className="flex items-center justify-between p-4 border-b border-border/50">
-      <div className="flex items-center">
-        <Music className="h-5 w-5 mr-2 text-band-purple animate-pulse-light" />
-        <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold`}>
-          {bandName} <span className="text-band-purple">Brain</span>Hub
-        </h1>
-      </div>
-      
-      <div className="flex items-center gap-2">
-        {user && (
-          <div className="mr-2 text-sm text-muted-foreground">
-            {user.email?.split('@')[0]}
-          </div>
-        )}
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center justify-between">
+        <div className="flex items-center gap-2 font-semibold text-lg">
+          <span className="text-band-green font-bold">🎸 Band Brain Hub</span>
+        </div>
         
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Settings className="h-4 w-4" />
-              <span className="sr-only">Settings</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Log out</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center space-x-4">
+          <BandSelector />
+          
+          {/* Sync status indicator */}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="flex items-center gap-1"
+            disabled={isSyncing || !isOnline}
+            onClick={forceSync}
+          >
+            {isOnline ? (
+              isSyncing ? (
+                <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
+              ) : (
+                <CheckCircle2 className="h-4 w-4 text-green-500" />
+              )
+            ) : (
+              <CloudOff className="h-4 w-4 text-orange-500" />
+            )}
+            <span className="text-xs hidden sm:inline ml-1">
+              {isOnline ? 
+                (isSyncing ? 'Syncing...' : `Last: ${formatSyncTime()}`) : 
+                'Offline'
+              }
+            </span>
+          </Button>
+
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">{user.email}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => signOut()}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
-    </div>
+    </header>
   );
 };
 

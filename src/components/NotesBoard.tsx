@@ -1,215 +1,268 @@
-
 import React, { useState } from 'react';
-import { Book, Plus, X } from 'lucide-react';
+import { StickyNote, Plus, Trash2, Edit, Save, X, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-
-interface Note {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  author: string;
-}
+import { useSupabaseQuery } from '@/hooks/useSupabaseQuery';
+import { useBand } from '@/contexts/BandContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { Note } from '@/lib/services/NoteService';
+import { format } from 'date-fns';
 
 const NotesBoard = () => {
   const { toast } = useToast();
-  const [notes, setNotes] = useState<Note[]>([
-    {
-      id: '1',
-      title: 'New song lyrics idea',
-      content: "Verse 1:\nWalking through the city streets at night\nLights are blinding but I feel alright\n\nChorus:\nThis is where we belong\nThis is our midnight song",
-      createdAt: '2025-04-08T15:32:00',
-      author: 'Jake'
-    },
-    {
-      id: '2',
-      title: 'For our next music video',
-      content: "Let's film in the abandoned factory we saw last week. I think the aesthetic would be perfect for the new single.",
-      createdAt: '2025-04-10T09:15:00',
-      author: 'Lisa'
-    }
-  ]);
+  const { currentBand } = useBand();
+  const { user } = useAuth();
   
-  const [newNote, setNewNote] = useState({
-    title: '',
-    content: '',
-    author: ''
+  const [editingNote, setEditingNote] = useState<string | null>(null);
+  const [newNoteTitle, setNewNoteTitle] = useState('');
+  const [newNoteContent, setNewNoteContent] = useState('');
+  const [editTitle, setEditTitle] = useState('');
+  const [editContent, setEditContent] = useState('');
+  
+  const {
+    data: notes,
+    loading,
+    error,
+    add: addNote,
+    update: updateNote,
+    remove: removeNote
+  } = useSupabaseQuery<Note>({
+    table: 'notes',
+    bandId: currentBand?.id,
+    orderBy: { column: 'created_at', ascending: false }
   });
   
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [viewNote, setViewNote] = useState<Note | null>(null);
-  const [viewOpen, setViewOpen] = useState(false);
-  
-  const addNote = () => {
-    if (!newNote.title || !newNote.content) {
+  const handleAddNote = async () => {
+    if (!currentBand || !user) {
       toast({
-        title: "Missing information",
-        description: "Please add a title and content",
+        title: "Error",
+        description: "You need to select a band first",
         variant: "destructive"
       });
       return;
     }
     
-    const note = {
-      ...newNote,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
-    };
-    
-    setNotes([...notes, note]);
-    setNewNote({
-      title: '',
-      content: '',
-      author: ''
-    });
-    
-    setDialogOpen(false);
-    
-    toast({
-      title: "Note added",
-      description: "Your note has been added to the board",
-    });
-  };
-  
-  const removeNote = (id: string) => {
-    setNotes(notes.filter(note => note.id !== id));
-    
-    if (viewNote?.id === id) {
-      setViewNote(null);
-      setViewOpen(false);
+    if (!newNoteTitle.trim()) {
+      toast({
+        title: "Note title required",
+        description: "Please enter a title for your note",
+        variant: "destructive"
+      });
+      return;
     }
     
-    toast({
-      title: "Note removed",
-      description: "The note has been removed from your board",
-    });
+    try {
+      await addNote({
+        band_id: currentBand.id,
+        title: newNoteTitle,
+        content: newNoteContent,
+        category: null,
+        created_by: user.id
+      });
+      
+      setNewNoteTitle('');
+      setNewNoteContent('');
+      
+      toast({
+        title: "Note added",
+        description: `"${newNoteTitle}" has been added to your notes`,
+      });
+    } catch (error) {
+      console.error('Error adding note:', error);
+      toast({
+        title: "Failed to add note",
+        description: "There was an error adding your note. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
   
-  const openViewNote = (note: Note) => {
-    setViewNote(note);
-    setViewOpen(true);
+  const handleEdit = (note: Note) => {
+    setEditingNote(note.id);
+    setEditTitle(note.title);
+    setEditContent(note.content);
+  };
+  
+  const handleSaveEdit = async (id: string) => {
+    if (!editTitle.trim()) {
+      toast({
+        title: "Note title required",
+        description: "Please enter a title for your note",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      await updateNote(id, {
+        title: editTitle,
+        content: editContent
+      });
+      
+      setEditingNote(null);
+      
+      toast({
+        title: "Note updated",
+        description: `"${editTitle}" has been updated`,
+      });
+    } catch (error) {
+      console.error('Error updating note:', error);
+      toast({
+        title: "Failed to update note",
+        description: "There was an error updating your note. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  const handleDelete = async (id: string, title: string) => {
+    try {
+      await removeNote(id);
+      
+      toast({
+        title: "Note deleted",
+        description: `"${title}" has been deleted`,
+      });
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      toast({
+        title: "Failed to delete note",
+        description: "There was an error deleting your note. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
   
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return format(new Date(dateString), 'MMM d, yyyy');
   };
 
   return (
     <Card className="band-card">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg font-bold flex items-center">
-          <Book className="h-5 w-5 mr-2 text-band-yellow" />
+          <StickyNote className="h-5 w-5 mr-2 text-band-yellow" />
           Notes
         </CardTitle>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="h-8 gap-1">
-              <Plus className="h-4 w-4" /> New Note
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Add New Note</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Title</label>
-                <input
-                  className="band-input"
-                  value={newNote.title}
-                  onChange={(e) => setNewNote({...newNote, title: e.target.value})}
-                  placeholder="Note title"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Content</label>
-                <textarea
-                  className="band-input min-h-[120px]"
-                  value={newNote.content}
-                  onChange={(e) => setNewNote({...newNote, content: e.target.value})}
-                  placeholder="Write your note here..."
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Author</label>
-                <input
-                  className="band-input"
-                  value={newNote.author}
-                  onChange={(e) => setNewNote({...newNote, author: e.target.value})}
-                  placeholder="Your name"
-                />
-              </div>
-              
-              <Button onClick={addNote} className="w-full mt-4">
-                Save Note
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-        
-        <Dialog open={viewOpen} onOpenChange={setViewOpen}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>{viewNote?.title}</DialogTitle>
-            </DialogHeader>
-            <div className="pt-4">
-              <div className="flex justify-between items-center text-xs text-muted-foreground mb-4">
-                <span>{viewNote?.author}</span>
-                <span>{viewNote && formatDate(viewNote.createdAt)}</span>
-              </div>
-              <div className="whitespace-pre-wrap bg-secondary/30 p-4 rounded-md">
-                {viewNote?.content}
-              </div>
-              <div className="flex justify-end mt-4">
-                <Button 
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => viewNote && removeNote(viewNote.id)}
-                >
-                  <X className="h-4 w-4 mr-1" /> Delete Note
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
       </CardHeader>
       <CardContent>
-        {notes.length === 0 ? (
-          <div className="text-center text-muted-foreground py-8">
-            No notes yet. Create your first note!
+        {!currentBand ? (
+          <div className="text-center py-6 text-muted-foreground">
+            <AlertCircle className="h-8 w-8 mx-auto mb-2" />
+            <p>Select a band to manage notes</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-              .map(note => (
-              <div 
-                key={note.id} 
-                className="cursor-pointer rounded-md p-3 bg-secondary/30 hover:bg-secondary/50 transition-all h-[120px] flex flex-col border border-transparent hover:border-band-yellow/30"
-                onClick={() => openViewNote(note)}
-              >
-                <div className="flex justify-between items-start">
-                  <h3 className="font-medium truncate">{note.title}</h3>
+          <div className="space-y-4">
+            <div className="grid gap-2">
+              <Input
+                placeholder="Note title"
+                value={newNoteTitle}
+                onChange={(e) => setNewNoteTitle(e.target.value)}
+                className="band-input"
+              />
+              <Textarea
+                placeholder="Note content..."
+                value={newNoteContent}
+                onChange={(e) => setNewNoteContent(e.target.value)}
+                className="band-input min-h-[80px]"
+              />
+              <Button onClick={handleAddNote} className="w-full">
+                <Plus className="h-4 w-4 mr-2" /> Add Note
+              </Button>
+            </div>
+
+            <div className="space-y-4 mt-4">
+              {loading ? (
+                <div className="text-center py-4 text-muted-foreground">
+                  Loading notes...
                 </div>
-                <div className="text-xs text-muted-foreground mt-1 flex justify-between">
-                  <span>{note.author}</span>
-                  <span>{formatDate(note.createdAt)}</span>
+              ) : error ? (
+                <div className="text-center py-4 text-destructive">
+                  <p>Error loading notes</p>
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    className="mt-2"
+                    onClick={() => window.location.reload()}
+                  >
+                    Reload
+                  </Button>
                 </div>
-                <p className="text-sm mt-2 overflow-hidden line-clamp-3 flex-grow">
-                  {note.content}
-                </p>
-              </div>
-            ))}
+              ) : notes.length === 0 ? (
+                <div className="text-center text-muted-foreground py-4">
+                  No notes yet. Add your first note above!
+                </div>
+              ) : (
+                notes.map((note) => (
+                  <div key={note.id} className="p-4 rounded-md bg-secondary/30 hover:bg-secondary/40 transition-colors">
+                    {editingNote === note.id ? (
+                      <>
+                        <div className="space-y-2 mb-2">
+                          <Input
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            className="band-input"
+                          />
+                          <Textarea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            className="band-input min-h-[100px]"
+                          />
+                        </div>
+                        <div className="flex justify-end gap-2 mt-2">
+                          <Button 
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditingNote(null)}
+                          >
+                            <X className="h-4 w-4 mr-1" /> Cancel
+                          </Button>
+                          <Button 
+                            size="sm"
+                            onClick={() => handleSaveEdit(note.id)}
+                          >
+                            <Save className="h-4 w-4 mr-1" /> Save
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-medium text-lg">{note.title}</h3>
+                          <div className="flex gap-1">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8"
+                              onClick={() => handleEdit(note)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8"
+                              onClick={() => handleDelete(note.id, note.title)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="mt-1 text-sm text-muted-foreground mb-2">
+                          {formatDate(note.created_at)}
+                        </div>
+                        <div className="text-sm whitespace-pre-wrap">
+                          {note.content}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         )}
       </CardContent>

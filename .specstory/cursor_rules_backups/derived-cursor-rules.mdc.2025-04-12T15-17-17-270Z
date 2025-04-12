@@ -1,0 +1,49 @@
+
+## PROJECT OVERVIEW
+
+Band Brain Hub: A collaborative single-page web application for band management. Focus on rapid deployment, excellent UX/UI, and seamless mobile experience.  Real-time synchronization and offline support are no longer critical.  New approach prioritizes simplicity and a single-file architecture.
+
+## CODE STYLE
+
+To be defined based on the chosen tech stack for the single-file application.
+
+## FOLDER ORGANIZATION
+
+The project will now use a single-file architecture.  Previous folder structure is obsolete.
+
+## TECH STACK
+
+(To be defined. Previous tech stack is no longer relevant.  Consider frameworks enabling single-file applications.)
+
+## PROJECT-SPECIFIC STANDARDS
+
+- Prioritize intuitive UX/UI design, considering the needs of non-technical band members.  The application should be fun and easy to use.
+- All functionality must be contained within a single file.
+- No external backend (e.g., Supabase) will be used. Data will be managed within the single file using Types/JSON or a similar approach.
+- Comprehensive error handling and loading states are essential.
+
+## WORKFLOW & RELEASE RULES
+
+(To be defined based on the new single-file development approach.)
+
+## REFERENCE EXAMPLES
+
+(To be added as the project progresses)
+
+## PROJECT DOCUMENTATION & CONTEXT SYSTEM
+
+(To be defined based on the new single-file development approach. Consider embedding documentation within the single file.)
+
+## DEBUGGING
+
+(To be defined based on the new single-file development approach)
+
+## FINAL DOs AND DON'Ts
+
+- **DO:** Prioritize simplicity and ease of use in the UI design.
+- **DO:** Design with an intuitive UX/UI that is accessible to non-technical users.
+- **DO:** Ensure consistent error handling and loading states throughout the application.
+- **DO:**  Maintain all application code within a single file.
+- **DO:** Use Types/JSON or a similar method for managing data within the single file.
+- **DON'T:** Use any external backend services.
+- **DON'T:**  Rely on local state for data persistence (unless integrated directly within the single file).
