@@ -1,7 +1,3 @@
----
-description: Cursor rules derived by SpecStory from the project AI interaction history
-globs: *
----
 
 ## PROJECT OVERVIEW
 
@@ -9,11 +5,11 @@ Band Brain Hub: A collaborative single-page web application for band management.
 
 ## CODE STYLE
 
-React, Tailwind CSS, Babel, uuid. Uses a single `app.js` file and integrated JSON-like data persistence within the single file using localStorage. TypeScript is no longer used. App configuration is manually configurable within `app.js`. Button-to-input transformations are prioritized over modals or popups. Improved mobile UX with better touch interactions. Offline indicators implemented. Added support for PWA functionality (optional). Added support for improved touch interactions and swipe functionality.  Enhanced button styles for touch.  Offline detection and indicator implemented.  Add to home screen prompt implemented.  System dark mode detection implemented.
+React, Tailwind CSS, Babel, uuid. Uses a single `app.js` file and integrated JSON-like data persistence within the single file using localStorage.  TypeScript is no longer used. App configuration is manually configurable within `app.js`.  Button-to-input transformations are prioritized over modals or popups.  Improved mobile UX with better touch interactions. Offline indicators implemented.  Added support for PWA functionality (optional).  Added support for improved touch interactions and swipe functionality.
 
 ## FOLDER ORGANIZATION
 
-The project uses a single-file architecture (`app.js`, `index.html`, `manifest.json`, `service-worker.js`). `manifest.json` and `service-worker.js` are optional for PWA functionality. Previous folder structure is obsolete.
+The project uses a single-file architecture (`app.js`, `index.html`, `manifest.json`, `service-worker.js`).  `manifest.json` and `service-worker.js` are optional for PWA functionality.  Previous folder structure is obsolete.
 
 ## TECH STACK
 
@@ -22,7 +18,7 @@ React 18, React DOM 18, @babel/standalone, Tailwind CSS 2.2.19, Font Awesome 6.0
 ## PROJECT-SPECIFIC STANDARDS
 
 - Prioritize intuitive UX/UI design, considering the needs of non-technical band members.
-- All core functionality must be contained within `app.js` and `index.html`. `manifest.json` and `service-worker.js` are optional for PWA features.
+- All core functionality must be contained within `app.js` and `index.html`.  `manifest.json` and `service-worker.js` are optional for PWA features.
 - No external backend (e.g., Supabase) will be used. Data will be managed within the single files using localStorage.
 - Comprehensive error handling and loading states are essential.
 - Utilize button-to-input transformations instead of modals or popups where feasible.
@@ -34,7 +30,7 @@ React 18, React DOM 18, @babel/standalone, Tailwind CSS 2.2.19, Font Awesome 6.0
 
 ## WORKFLOW & RELEASE RULES
 
-Single file deployment. Workflow includes data export/import functionality for backups and resets. For remote repositories, deployment for end-to-end testing should leverage a platform supporting direct file uploads (e.g., Github Pages, Netlify, Vercel). Consider using Docker and Caddy for deployment on a server environment. Local testing with VSCode Live Server is also an option. Deployment options include SCP, Git-based workflows, or SSH commands with heredocs. Direct file uploads via platforms like Netlify Drop are also suitable for testing.  Deployment options for remote repositories include direct file uploads (e.g., Netlify Drop), GitHub Pages, Vercel.
+Single file deployment. Workflow includes data export/import functionality for backups and resets. For remote repositories, deployment for end-to-end testing should leverage a platform supporting direct file uploads (e.g., Github Pages, Netlify, Vercel). Consider using Docker and Caddy for deployment on a server environment.  Local testing with VSCode Live Server is also an option.  Deployment options include SCP, Git-based workflows, or SSH commands with heredocs.  Direct file uploads via platforms like Netlify Drop are also suitable for testing.
 
 ## REFERENCE EXAMPLES
 
