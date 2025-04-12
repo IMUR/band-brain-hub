@@ -44,12 +44,20 @@
 
   body {
     @apply bg-band-dark-bg text-foreground;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    html, body {
+      @apply overscroll-none;
+    }
   }
 
   /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 4px;
+    height: 4px;
   }
   
   ::-webkit-scrollbar-track {
@@ -83,4 +91,21 @@
   .music-gradient {
     @apply bg-gradient-to-br from-band-purple to-band-deep-purple;
   }
+
+  /* Mobile optimized card */
+  .mobile-card {
+    @apply bg-card rounded-lg border border-border/50 p-3 shadow-md transition-all;
+  }
 }
+
+/* Mobile touch feedback */
+@media (max-width: 768px) {
+  .band-card:active {
+    @apply bg-secondary/40 scale-[0.98] transition-all duration-100;
+  }
+
+  input, button, select, textarea {
+    @apply text-base; /* Prevents iOS zoom on input focus */
+  }
+}
+
