@@ -8,7 +8,6 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
-import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();
 
@@ -29,27 +28,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const AppRoutes = () => {
-  const [envError, setEnvError] = useState<string | null>(null);
-  
-  useEffect(() => {
-    // Check for required environment variables
-    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-      setEnvError("Missing Supabase configuration. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.");
-    }
-  }, []);
-  
-  if (envError) {
-    return (
-      <div className="h-screen flex flex-col items-center justify-center p-4 text-center">
-        <h1 className="text-2xl font-bold text-red-500 mb-4">Configuration Error</h1>
-        <p className="mb-4">{envError}</p>
-        <p className="text-sm text-muted-foreground">
-          Make sure you have connected your Supabase project and set the environment variables.
-        </p>
-      </div>
-    );
-  }
-  
   return (
     <BrowserRouter>
       <Routes>

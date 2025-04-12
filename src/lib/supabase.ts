@@ -1,25 +1,12 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// Get environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Use hardcoded Supabase credentials from the connected project
+const supabaseUrl = "https://jdbkcjbgjqnbmznxobjl.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYmtjamJnanFuYm16bnhvYmpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0NTY1NTIsImV4cCI6MjA2MDAzMjU1Mn0.yMjafay-ju5UtnApmuQHHZ1Ygw3nQn7PPWVju0YjVeY";
 
-// Validate environment variables
-if (!supabaseUrl) {
-  console.error('Missing VITE_SUPABASE_URL environment variable');
-}
-
-if (!supabaseAnonKey) {
-  console.error('Missing VITE_SUPABASE_ANON_KEY environment variable');
-}
-
-// Create Supabase client with fallback empty strings to prevent runtime errors
-// Note: The client won't work properly until valid credentials are provided
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder-url.supabase.co',
-  supabaseAnonKey || 'placeholder-key'
-);
+// Create Supabase client with the hardcoded credentials
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export type Database = {
   public: {
