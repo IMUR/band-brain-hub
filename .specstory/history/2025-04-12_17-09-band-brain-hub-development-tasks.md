@@ -1935,6 +1935,107 @@ PS E:\Band_Page>
 
 ---
 
+_**User**_
+
+
+1. Set up Puppeteer with Chrome extension:
+   - Launch browser with args: `--disable-extensions-except=/e:/Band_Page/chrome-extension`, `--load-extension=/e:/Band_Page/chrome-extension`
+   - puppeteer_navigate to localhost preview URL
+
+2. check browser-tools MCP: getConsoleLogs, getConsoleErrors, getNetworkLogs, getNetworkErrors, takeScreenshot, runPerformanceAudit
+
+3. attempt fix based on diagnostic information:
+   - Analyze errors and logs
+   - Make targeted code changes
+
+4. update memory MCP: read_graph, search_nodes, open_nodes, create_entities, create_relations, add_observations
+   - Record issues found and fixes attempted
+
+5. run: bun run build
+   - Automatically triggers puppeteer_navigate to refresh browser
+
+6. use puppeteer MCP: puppeteer_click, puppeteer_fill, puppeteer_select, puppeteer_hover, puppeteer_evaluate, puppeteer_screenshot
+   - Test application functionality
+   - Trigger potential error conditions
+   - Exercise UI components
+
+7. check browser-tools MCP: getConsoleLogs, getConsoleErrors, getNetworkLogs, getNetworkErrors, takeScreenshot, runAccessibilityAudit
+   - Compare with pre-fix diagnostics
+
+8. undo ineffective attempted fixes (if errors persist or new ones appear):
+   - memory MCP: delete_entities, delete_relations, delete_observations
+   - Revert code changes
+   - Record failed fix attempt
+
+9. use browser-tools MCP: wipeLogs
+   - Clear console state for next iteration
+
+10. run: bun run build
+    - Automatically triggers puppeteer_navigate to refresh browser
+
+Repeat
+
+@test-tools 
+
+---
+
+_**Assistant**_
+
+
+
+---
+
+I'll help you set up and run the test automation loop for your Band Brain Hub application. Let me first examine the test-tools to understand how the process loop works:
+
+---
+
+Read file: test-tools/process-loop.md
+
+---
+
+Read file: test-tools/process-loop.js
+
+---
+
+Read file: test-tools/config.js
+
+---
+
+```bash
+dir chrome-extension
+```
+
+```
+PS E:\Band_Page> dir chrome-extension
+
+    Directory: E:\Band_Page\chrome-extension
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---            4/6/2025  5:13 AM          13356 background.js
+-a---            4/6/2025  5:13 AM            213 devtools.html
+-a---            4/6/2025  5:13 AM          34415 devtools.js
+-a---            4/6/2025  5:13 AM            518 manifest.json
+-a---            4/6/2025  5:13 AM           6713 panel.html
+-a---            4/6/2025  5:13 AM          33473 panel.js
+
+PS E:\Band_Page>
+```
+
+---
+
+I'll help you implement this test automation loop. First, we need to install the necessary dependencies:
+
+---
+
+Cancelled
+
+---
+
+
+
+---
+
 
 
 ---

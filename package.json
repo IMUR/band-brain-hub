@@ -4,9 +4,15 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "bunx --bun vite --host",
-    "build": "bunx --bun vite build",
-    "preview": "bunx --bun vite preview"
+    "dev": "bun vite --host",
+    "build": "bun vite build",
+    "preview": "bun vite preview",
+    "process-loop": "bun test-tools/process-loop.js",
+    "build-watch": "bun vite build --watch",
+    "debug-autofix": "bun test-tools/process-loop.js",
+    "process-loop:cli": "bun test-tools/cli.js",
+    "test:headless": "bun test-tools/cli.js --headless",
+    "test:iterations": "bun test-tools/cli.js --max-iterations"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
