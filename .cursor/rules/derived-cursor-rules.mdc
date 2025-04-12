@@ -1,0 +1,43 @@
+---
+description: Cursor rules derived by SpecStory from the project AI interaction history
+globs: *
+---
+
+## PROJECT OVERVIEW
+Band Brain Hub is a single-page, mobile-critical web application designed for band members to collaboratively manage events, tasks, notes, finances, and setlists.  The application prioritizes rapid deployment, excellent UX/UI, and seamless real-time synchronization. Offline support is crucial.  The application is now implemented as a single-file application using React, and leveraging local storage for persistence.
+
+## CODE STYLE
+Consistent with standard React/Javascript best practices.  Emphasis on readability and maintainability.
+
+## FOLDER ORGANIZATION
+N/A - Single file application.
+
+## TECH STACK
+React, Javascript, HTML, CSS, Tailwind CSS, Font Awesome, uuid
+
+## PROJECT-SPECIFIC STANDARDS
+- All data is persisted locally in the browser's localStorage.
+- The application is designed as a single-file application for ease of deployment and maintenance.
+- UI should be intuitive for users with varying levels of technical expertise.
+- The application should maintain a conversational tone in interactions with users.
+
+## WORKFLOW & RELEASE RULES
+Rapid iterative development and deployment cycles.  Prioritize features based on user needs and feedback.
+
+## REFERENCE EXAMPLES
+N/A - Single file application.
+
+
+## PROJECT DOCUMENTATION & CONTEXT SYSTEM
+All documentation is embedded within the `app.js` file through comments and type definitions.
+
+## DEBUGGING
+Standard browser developer tools.
+
+## FINAL DOs AND DON'Ts
+- **DO** prioritize simplicity and ease of use.
+- **DO** ensure the application is mobile-friendly and responsive.
+- **DO** maintain a consistent and visually appealing design.
+- **DO** use clear and concise language in all interactions.
+- **DON'T** use external backend services (e.g., Supabase).
+- **DON'T** over-engineer solutions; strive for simplicity.
