@@ -1,0 +1,671 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Enhanced Svelte 5 Runes Guidelines
+
+This document provides comprehensive guidelines for using Svelte 5 Runes. It's designed to be precise and easily referenced by development tools.
+
+## Runes Fundamentals
+
+Runes are Svelte 5's unified reactive primitives that provide explicit reactivity. Unlike previous Svelte versions which had different reactivity patterns for components vs. modules, Runes create a consistent reactivity model throughout your application.
+
+### Core Principles
+
+1. **Explicit reactivity**: All reactive values are clearly marked
+2. **Fine-grained reactivity**: Updates only what needs to change
+3. **Consistent model**: Same patterns work everywhere
+4. **No "magic"**: Reactivity is visible in the code
+
+## Important: Runes File Type Requirements
+
+Runes can **only** be used in the following file types:
+- `.svelte` - Standard Svelte component files
+- `.svelte.js` - JavaScript files processed by the Svelte compiler
+- `.svelte.ts` - TypeScript files processed by the Svelte compiler
+
+Regular `.js` and `.ts` files **cannot** use runes syntax.
+
+## Important: No Imports for Runes
+
+Runes are compiler primitives, not imported functions. **Do not** import runes from 'svelte' or any other package:
+
+```svelte
+<!-- ❌ INCORRECT: Don't import runes -->
+<script>
+  import { $state, $effect, $derived, $props } from 'svelte'; // WRONG!
+  
+  let count = $state(0);
+</script>
+
+<!-- ✅ CORRECT: Use runes directly -->
+<script>
+  // No imports needed for runes
+  let count = $state(0);
+  let doubled = $derived(count * 2);
+</script>
+```
+
+## Required Rune Usage
+
+### `$state` - Reactive Variables
+
+Creates reactive state that triggers updates when changed.
+
+```typescript
+// Basic usage
+let count = $state(0);
+
+// With TypeScript type annotation
+let user = $state<User | null>(null);
+
+// With complex types
+let settings = $state<{
+  darkMode: boolean;
+  notifications: boolean;
+}>({
+  darkMode: false,
+  notifications: true
+});
+
+// Arrays
+let items = $state<string[]>([]);
+
+// Updating state
+count++; // Direct mutation
+items = [...items, newItem]; // Immutable update pattern
+settings = { ...settings, darkMode: true }; // Partial update
+```
+
+### `$props` - Component Properties
+
+Declares and extracts component props with optional default values.
+
+```typescript
+// Basic usage
+let { name } = $props();
+
+// With default values
+let { title = 'Default Title', count = 0 } = $props();
+
+// With TypeScript interfaces
+interface $$Props {
+  user: User;
+  onSave?: (user: User) => void;
+  isAdmin?: boolean;
+}
+
+let { user, onSave, isAdmin = false } = $props<$$Props>();
+
+// Alternative inline type annotation
+let { items, onSelect }: { 
+  items: Item[]; 
+  onSelect: (item: Item) => void 
+} = $props();
+```
+
+### `$derived` - Computed Values
+
+Creates values derived from other reactive values.
+
+```typescript
+// Basic derivation
+let count = $state(0);
+let doubled = $derived(count * 2);
+
+// With TypeScript type annotation
+let filteredItems = $derived<Item[]>(
+  items.filter(item => item.active)
+);
+
+// Complex derivations
+let stats = $derived({
+  total: items.length,
+  completed: items.filter(i => i.completed).length,
+  remaining: items.filter(i => !i.completed).length,
+  percentage: items.length ? 
+    Math.round((items.filter(i => i.completed).length / items.length) * 100) : 0
+});
+
+// Conditional derivation
+let message = $derived(
+  count === 0 ? 'No items' :
+  count === 1 ? '1 item' :
+  `${count} items`
+);
+```
+
+### `$effect` - Reactive Side Effects
+
+Runs code when reactive dependencies change.
+
+```typescript
+// Basic usage
+$effect(() => {
+  console.log(`Count is now: ${count}`);
+});
+
+// With cleanup
+$effect(() => {
+  const handler = (e) => {
+    // Handle event
+  };
+  window.addEventListener('resize', handler);
+  
+  // Return cleanup function
+  return () => {
+    window.removeEventListener('resize', handler);
+  };
+});
+
+// Data fetching example
+$effect(async () => {
+  if (!userId) return;
+  
+  isLoading = true;
+  try {
+    const response = await fetch(`/api/user/${userId}`);
+    userData = await response.json();
+  } catch (error) {
+    errorMessage = error.message;
+  } finally {
+    isLoading = false;
+  }
+});
+
+// Conditional effect
+$effect(() => {
+  if (isVisible) {
+    // Do something when visible
+  }
+});
+```
+
+### `$effect.root` - Scoping Effects
+
+Creates a scope for effects to make cleanup more predictable.
+
+```typescript
+$effect.root(() => {
+  // Create a group of effects that will be cleaned up together
+  $effect(() => {
+    // Effect 1
+  });
+  
+  $effect(() => {
+    // Effect 2
+  });
+});
+```
+
+## Prohibited Legacy Patterns
+
+The following patterns from Svelte 3/4 are strictly forbidden:
+
+❌ **No `onMount`**: Replace with `$effect`
+```typescript
+// WRONG
+onMount(() => {
+  fetchData();
+});
+
+// CORRECT
+$effect(() => {
+  fetchData();
+});
+```
+
+❌ **No `onDestroy`**: Replace with `$effect.cleanup`
+```typescript
+// WRONG
+onDestroy(() => {
+  clearInterval(interval);
+});
+
+// CORRECT
+$effect(() => {
+  const interval = setInterval(tick, 1000);
+  return () => clearInterval(interval);
+});
+```
+
+❌ **No reactive statements with `$:`**
+```typescript
+// WRONG
+$: doubled = count * 2;
+$: if (count > 10) {
+  alert('Count is too high!');
+}
+
+// CORRECT
+let doubled = $derived(count * 2);
+$effect(() => {
+  if (count > 10) {
+    alert('Count is too high!');
+  }
+});
+```
+
+❌ **No store subscriptions with `$store` syntax**
+```typescript
+// WRONG
+import { writable } from 'svelte/store';
+const count = writable(0);
+$: console.log($count);
+
+// CORRECT
+let count = $state(0);
+$effect(() => {
+  console.log(count);
+});
+```
+
+❌ **No component lifecycle methods**
+```typescript
+// WRONG
+beforeUpdate(() => {
+  console.log('Component is about to update');
+});
+afterUpdate(() => {
+  console.log('Component just updated');
+});
+
+// CORRECT
+$effect(() => {
+  // Run after render
+  console.log('Component updated');
+});
+```
+
+## Mandated Component Structure
+
+All components must follow this exact structure:
+
+```svelte
+<script lang="ts">
+  // 1. Imports (grouped by type/origin)
+  import { SomeComponent } from './components';
+  import type { SomeType } from './types';
+  import { someUtility } from './utils';
+  
+  // 2. Props with type definitions
+  interface $$Props {
+    item: Item;
+    onUpdate?: (item: Item) => void;
+  }
+  let { item, onUpdate } = $props<$$Props>();
+  
+  // 3. Local state variables
+  let count = $state(0);
+  let isLoading = $state(false);
+  let error = $state<string | null>(null);
+  
+  // 4. Derived values
+  let isValid = $derived(item.name.length > 0);
+  let displayText = $derived(
+    isValid ? `Valid item: ${item.name}` : 'Invalid item'
+  );
+  
+  // 5. Effects (side effects with cleanup)
+  $effect(() => {
+    // Effect implementation
+    
+    // Cleanup (if needed)
+    return () => {
+      // Cleanup code
+    };
+  });
+  
+  // 6. Event handlers and utility functions
+  function handleClick() {
+    count++;
+    if (onUpdate) {
+      onUpdate(item);
+    }
+  }
+  
+  async function loadData() {
+    isLoading = true;
+    try {
+      // Implementation
+    } catch (e) {
+      error = e.message;
+    } finally {
+      isLoading = false;
+    }
+  }
+</script>
+
+<!-- Component template -->
+<div>
+  <h2>{displayText}</h2>
+  {#if isLoading}
+    <p>Loading...</p>
+  {:else if error}
+    <p class="error">{error}</p>
+  {:else}
+    <button onclick={handleClick}>
+      Clicked {count} times
+    </button>
+  {/if}
+</div>
+
+<style>
+  /* Component styles */
+  .error {
+    color: red;
+  }
+</style>
+```
+
+## External Library Integration
+
+When integrating external libraries, always use Svelte 5's reactivity patterns:
+
+```typescript
+// MapLibre GL Integration Example
+$effect(() => {
+  if (!mapContainer) return;
+  
+  // Initialize library
+  const map = new maplibregl.Map({
+    container: mapContainer,
+    style: 'https://api.maptiler.com/maps/streets/style.json?key=' + apiKey,
+    center: [lng, lat],
+    zoom: zoom
+  });
+  
+  // Add controls, layers, etc.
+  map.addControl(new maplibregl.NavigationControl());
+  
+  // Event listeners
+  map.on('move', () => {
+    // Update reactive state
+    lng = map.getCenter().lng;
+    lat = map.getCenter().lat;
+    zoom = map.getZoom();
+  });
+  
+  // Cleanup function MUST be returned
+  return () => {
+    map.remove();
+  };
+});
+```
+
+## Store Pattern with Runes
+
+Runes-based stores must be created in `.svelte.js` or `.svelte.ts` files:
+
+```typescript
+// stores/userStore.svelte.ts - Note the .svelte.ts extension
+// Core state
+let currentUser = $state<User | null>(null);
+let isLoading = $state(false);
+let error = $state<string | null>(null);
+
+// Derived values
+let isLoggedIn = $derived(currentUser !== null);
+let username = $derived(currentUser?.username || 'Guest');
+
+// Actions
+async function login(credentials: Credentials): Promise<void> {
+  isLoading = true;
+  error = null;
+  
+  try {
+    // Implementation
+    currentUser = await authService.login(credentials);
+  } catch (e) {
+    error = e.message;
+    currentUser = null;
+  } finally {
+    isLoading = false;
+  }
+}
+
+function logout(): void {
+  currentUser = null;
+}
+
+// Export
+export const userStore = {
+  // State (use getters for immutability)
+  get currentUser() { return currentUser; },
+  get isLoading() { return isLoading; },
+  get error() { return error; },
+  get isLoggedIn() { return isLoggedIn; },
+  get username() { return username; },
+  
+  // Actions
+  login,
+  logout
+};
+```
+
+Using the store in components:
+
+```svelte
+<script>
+  import { userStore } from './stores/userStore.svelte.ts';
+  
+  function handleLogin() {
+    userStore.login({ username: 'user', password: 'pass' });
+  }
+</script>
+
+<div>
+  {#if userStore.isLoggedIn}
+    <p>Welcome, {userStore.username}!</p>
+    <button onclick={userStore.logout}>Logout</button>
+  {:else}
+    <button onclick={handleLogin}>Login</button>
+  {/if}
+</div>
+```
+
+## Common Pitfalls to Avoid
+
+1. **Mutating props directly**
+   ```typescript
+   // WRONG
+   let { count } = $props();
+   function increment() {
+     count++; // Never mutate props!
+   }
+   
+   // CORRECT
+   let { count, onIncrement } = $props();
+   function increment() {
+     if (onIncrement) onIncrement(count + 1);
+   }
+   ```
+
+2. **Using non-reactive variables in effects**
+   ```typescript
+   // WRONG
+   let count = 0; // Not reactive
+   $effect(() => {
+     console.log(count); // Won't re-run when count changes
+   });
+   
+   // CORRECT
+   let count = $state(0);
+   $effect(() => {
+     console.log(count); // Will re-run when count changes
+   });
+   ```
+
+3. **Missing cleanup functions**
+   ```typescript
+   // WRONG
+   $effect(() => {
+     const interval = setInterval(() => {
+       count++;
+     }, 1000);
+     // Missing cleanup!
+   });
+   
+   // CORRECT
+   $effect(() => {
+     const interval = setInterval(() => {
+       count++;
+     }, 1000);
+     return () => clearInterval(interval);
+   });
+   ```
+
+4. **Overusing effects for derived values**
+   ```typescript
+   // WRONG
+   let doubled = $state(0);
+   $effect(() => {
+     doubled = count * 2;
+   });
+   
+   // CORRECT
+   let doubled = $derived(count * 2);
+   ```
+
+5. **Async effects without cleanup**
+   ```typescript
+   // WRONG - Potential race conditions
+   $effect(async () => {
+     const data = await fetchData();
+     result = data;
+   });
+   
+   // BETTER
+   $effect(() => {
+     let isCurrent = true;
+     fetchData().then(data => {
+       if (isCurrent) result = data;
+     });
+     return () => { isCurrent = false; };
+   });
+   ```
+
+6. **Using runes in regular `.js` or `.ts` files**
+   ```typescript
+   // WRONG - regular.ts
+   let count = $state(0); // Will cause errors
+   
+   // CORRECT - store.svelte.ts
+   let count = $state(0); // Works correctly
+   ```
+
+7. **Importing runes from 'svelte'**
+   ```typescript
+   // WRONG
+   import { $state } from 'svelte';
+   let count = $state(0);
+   
+   // CORRECT
+   // No imports needed
+   let count = $state(0);
+   ```
+
+## Event Handling in Templates
+
+Svelte 5 uses `onclick` instead of `on:click`:
+
+```svelte
+<!-- WRONG -->
+<button on:click={handleClick}>Click me</button>
+
+<!-- CORRECT -->
+<button onclick={handleClick}>Click me</button>
+```
+
+For custom events:
+
+```svelte
+<!-- Custom event dispatch -->
+<script>
+  function dispatchCustomEvent() {
+    const event = new CustomEvent('myevent', { 
+      detail: { value: 42 } 
+    });
+    element.dispatchEvent(event);
+  }
+</script>
+
+<!-- Event listening -->
+<div onmyevent={(e) => handleMyEvent(e.detail.value)}></div>
+```
+
+## Bundler Configuration
+
+When using Bun or other bundlers with Svelte 5, ensure your configuration processes all appropriate file extensions:
+
+```javascript
+// Example Bun plugin configuration
+SveltePlugin({
+  extensions: ['.svelte', '.svelte.js', '.svelte.ts'],
+  development: process.env.NODE_ENV !== 'production'
+})
+```
+
+```toml
+# bunfig.toml
+[serve.static]
+plugins = ["bun-plugin-svelte"]
+```
+
+For other bundlers, ensure the Svelte plugin is configured to handle all required file extensions.
+
+## Advanced TypeScript Integration
+
+```typescript
+// Type-safe props
+interface $$Props<T> {
+  items: T[];
+  selectedId?: string;
+  onSelect: (item: T) => void;
+}
+
+let { items, selectedId, onSelect } = $props<$$Props<Item>>();
+
+// Type-safe effects with async
+$effect(async () => {
+  if (!userId) return;
+  
+  type UserResponse = {
+    user: User;
+    permissions: string[];
+  };
+  
+  try {
+    const response = await fetch(`/api/user/${userId}`);
+    const data = await response.json() as UserResponse;
+    currentUser = data.user;
+    userPermissions = data.permissions;
+  } catch (error) {
+    errorMessage = (error as Error).message;
+  }
+});
+```
+
+## Migration Guide from Old Patterns
+
+| Svelte 3/4 Pattern | Svelte 5 Runes Pattern |
+|--------------------|------------------------|
+| `let count = 0;`<br>`$: console.log(count);` | `let count = $state(0);`<br>`$effect(() => console.log(count));` |
+| `$: doubled = count * 2;` | `let doubled = $derived(count * 2);` |
+| `onMount(() => {...})` | `$effect(() => {...})` |
+| `onDestroy(() => {...})` | `$effect(() => { return () => {...} })` |
+| `import {writable} from 'svelte/store';`<br>`const count = writable(0);`<br>`$: console.log($count);` | `let count = $state(0);`<br>`$effect(() => console.log(count));` |
+| `export let prop;` | `let { prop } = $props();` |
+| `beforeUpdate/afterUpdate` | `$effect(() => {...})` |
+
+## Benefits of Runes
+
+1. **Explicit Reactivity**: Clear indication of which variables are reactive
+2. **TypeScript Integration**: Better type inference and checking
+3. **Performance**: Fine-grained reactivity with clear dependency tracking
+4. **Consistency**: Same model works across specific file types
+5. **Debugging**: Easier to trace reactivity flows
+6. **Portability**: Code can move between Svelte files
+7. **Reduced Boilerplate**: No need for store subscription management
+8. **IDE Support**: Better tooling integration

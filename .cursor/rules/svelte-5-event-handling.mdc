@@ -1,0 +1,687 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Svelte 5 Runes Comprehensive Guidelines
+
+## Event Handling and Communication Alternatives
+
+### Custom Events (replacing createEventDispatcher)
+
+In Svelte 5, custom events use standard web event patterns instead of `createEventDispatcher`:
+
+```typescript
+// SVELTE 3/4 APPROACH
+import { createEventDispatcher } from 'svelte';
+const dispatch = createEventDispatcher();
+
+function handleClick() {
+  dispatch('message', { text: 'Hello!' });
+}
+
+// SVELTE 5 APPROACH
+function handleClick(node) {
+  // Create and dispatch a standard CustomEvent
+  node.dispatchEvent(new CustomEvent('message', {
+    detail: { text: 'Hello!' },
+    bubbles: true // If you want event bubbling
+  }));
+}
+```
+
+Usage in parent component:
+
+```svelte
+<!-- SVELTE 3/4 -->
+<ChildComponent on:message={handleMessage} />
+
+<!-- SVELTE 5 -->
+<ChildComponent onmessage={handleMessage} />
+```
+
+### Context API Alternative
+
+Svelte 5 replaces the context API with a more direct approach using `$effect.root()` and prop passing:
+
+```typescript
+// SVELTE 3/4 APPROACH
+import { setContext, getContext } from 'svelte';
+
+// In parent component
+setContext('theme', { dark: true });
+
+// In child component
+const theme = getContext('theme');
+
+// SVELTE 5 APPROACH
+// Create a shared context module (contexts/theme.ts)
+let theme = $state({ dark: true });
+let updateTheme = (newTheme) => { theme = { ...theme, ...newTheme }; };
+
+export const themeContext = {
+  get theme() { return theme; },
+  updateTheme
+};
+
+// Use in any component
+import { themeContext } from './contexts/theme';
+
+// Access reactively
+$effect(() => {
+  console.log('Theme changed:', themeContext.theme);
+});
+```
+
+For nested scopes, use `$effect.root()`:
+
+```typescript
+$effect.root(() => {
+  // Create local state
+  let localData = $state({ count: 0 });
+  
+  // Make it available to child components
+  function ChildComponent() {
+    // Can access localData reactively
+    return {
+      /* component implementation */
+    };
+  }
+});
+```
+
+### Tick Alternative
+
+Svelte 5 replaces `tick()` with standard async/await patterns and microtask scheduling:
+
+```typescript
+// SVELTE 3/4 APPROACH
+import { tick } from 'svelte';
+
+async function updateThenMeasure() {
+  count++;
+  await tick();
+  // DOM is now updated
+  measureHeight();
+}
+
+// SVELTE 5 APPROACH
+async function updateThenMeasure() {
+  count++;
+  // Use microtask scheduling
+  await Promise.resolve();
+  // DOM is now updated
+  measureHeight();
+}
+```
+
+### Store Alternatives
+
+Svelte 5 Runes replace the `writable`/`readable`/`derived` stores pattern:
+
+```typescript
+// SVELTE 3/4 APPROACH
+import { writable, derived } from 'svelte/store';
+
+const count = writable(0);
+const doubled = derived(count, $count => $count * 2);
+
+// In component
+import { count, doubled } from './stores';
+$: console.log($count, $doubled);
+
+// SVELTE 5 APPROACH
+// stores/countStore.js
+let count = $state(0);
+let doubled = $derived(count * 2);
+
+function increment() {
+  count++;
+}
+
+export const countStore = {
+  get count() { return count; },
+  get doubled() { return doubled; },
+  increment
+};
+
+// In component
+import { countStore } from './stores/countStore';
+
+$effect(() => {
+  console.log(countStore.count, countStore.doubled);
+});
+
+// Action handler
+function handleClick() {
+  countStore.increment();
+}
+```
+
+### Slot Props Alternative
+
+Svelte 5 provides a new approach to slot props:
+
+```svelte
+<!-- SVELTE 3/4 APPROACH -->
+<!-- Parent.svelte -->
+<script>
+  import Child from './Child.svelte';
+</script>
+
+<Child let:item>
+  <p>{item.name}</p>
+</Child>
+
+<!-- Child.svelte -->
+<script>
+  let items = [{ name: 'Apple' }, { name: 'Banana' }];
+</script>
+
+{#each items as item}
+  <slot item={item} />
+{/each}
+
+<!-- SVELTE 5 APPROACH -->
+<!-- Parent.svelte -->
+<script>
+  import { renderSlot } from 'svelte';
+  import Child from './Child.svelte';
+  
+  // Create render function for slot content
+  function renderItem(item) {
+    return <p>{item.name}</p>;
+  }
+</script>
+
+<Child renderItem={renderItem} />
+
+<!-- Child.svelte -->
+<script>
+  let { renderItem } = $props();
+  let items = $state([{ name: 'Apple' }, { name: 'Banana' }]);
+</script>
+
+{#each items as item}
+  {renderItem(item)}
+{/each}
+```
+
+### Actions Alternative
+
+Actions in Svelte 5 use a more direct approach:
+
+```typescript
+// SVELTE 3/4 APPROACH
+function clickOutside(node) {
+  const handleClick = (event) => {
+    if (!node.contains(event.target)) {
+      node.dispatchEvent(new CustomEvent('outclick'));
+    }
+  };
+  
+  document.addEventListener('click', handleClick, true);
+  
+  return {
+    destroy() {
+      document.removeEventListener('click', handleClick, true);
+    }
+  };
+}
+
+// Usage: <div use:clickOutside on:outclick={handleOutClick}>...</div>
+
+// SVELTE 5 APPROACH
+function setupClickOutside(node, callback) {
+  const handleClick = (event) => {
+    if (!node.contains(event.target)) {
+      callback(event);
+    }
+  };
+  
+  document.addEventListener('click', handleClick, true);
+  
+  return () => {
+    document.removeEventListener('click', handleClick, true);
+  };
+}
+
+// In component
+let container = $state(null);
+
+$effect(() => {
+  if (!container) return;
+  
+  return setupClickOutside(container, () => {
+    console.log('Clicked outside');
+  });
+});
+
+// In template: <div bind:this={container}>...</div>
+```
+
+### Transitions and Animations
+
+For transitions, use standard web animations instead of Svelte's transition directives:
+
+```typescript
+// SVELTE 3/4 APPROACH
+import { fade, fly } from 'svelte/transition';
+
+// In template: <div transition:fade={{duration: 300}}>...</div>
+
+// SVELTE 5 APPROACH
+function setupTransition(node) {
+  // Entry animation
+  node.animate(
+    [
+      { opacity: 0, transform: 'translateY(20px)' },
+      { opacity: 1, transform: 'translateY(0)' }
+    ],
+    { duration: 300, easing: 'ease-out' }
+  );
+  
+  return () => {
+    // Exit animation
+    const animation = node.animate(
+      [
+        { opacity: 1, transform: 'translateY(0)' },
+        { opacity: 0, transform: 'translateY(20px)' }
+      ],
+      { duration: 300, easing: 'ease-in' }
+    );
+    
+    // Optional: wait for animation to complete before removing
+    return new Promise(resolve => {
+      animation.onfinish = resolve;
+    });
+  };
+}
+
+// In component
+let element = $state(null);
+let isVisible = $state(true);
+
+$effect(() => {
+  if (!element || !isVisible) return;
+  
+  return setupTransition(element);
+});
+
+// In template
+{#if isVisible}
+  <div bind:this={element}>Content</div>
+{/if}
+```
+
+## Advanced Patterns
+
+### Component Communication Patterns
+
+For component communication, Svelte 5 encourages these patterns:
+
+1. **Props Down, Events Up**: The most direct approach
+   ```svelte
+   <!-- Parent.svelte -->
+   <script>
+     let count = $state(0);
+     
+     function handleIncrement() {
+       count++;
+     }
+   </script>
+   
+   <Child count={count} onIncrement={handleIncrement} />
+   
+   <!-- Child.svelte -->
+   <script>
+     let { count, onIncrement } = $props();
+     
+     function handleClick() {
+       onIncrement?.();
+     }
+   </script>
+   
+   <button onclick={handleClick}>
+     Increment {count}
+   </button>
+   ```
+
+2. **Shared State Objects**: For related components
+   ```typescript
+   // sharedState.js
+   let activeTab = $state('home');
+   
+   export const tabState = {
+     get activeTab() { return activeTab; },
+     setActiveTab(tab) { activeTab = tab; }
+   };
+   
+   // Used in multiple components
+   import { tabState } from './sharedState';
+   
+   // In NavBar.svelte
+   function selectTab(tab) {
+     tabState.setActiveTab(tab);
+   }
+   
+   // In Content.svelte
+   $effect(() => {
+     console.log('Active tab:', tabState.activeTab);
+   });
+   ```
+
+3. **Global Event Bus**: For unrelated components
+   ```typescript
+   // eventBus.js
+   const bus = new EventTarget();
+   
+   export const eventBus = {
+     emit(event, detail) {
+       bus.dispatchEvent(new CustomEvent(event, { detail }));
+     },
+     on(event, callback) {
+       const handler = (e) => callback(e.detail);
+       bus.addEventListener(event, handler);
+       return () => bus.removeEventListener(event, handler);
+     }
+   };
+   
+   // In component A
+   import { eventBus } from './eventBus';
+   
+   function sendMessage() {
+     eventBus.emit('message', { text: 'Hello!' });
+   }
+   
+   // In component B
+   import { eventBus } from './eventBus';
+   
+   $effect(() => {
+     return eventBus.on('message', (data) => {
+       console.log('Received:', data.text);
+     });
+   });
+   ```
+
+### Lifecycle Hooks Alternatives
+
+Svelte 5 Runes replace all lifecycle hooks with `$effect`:
+
+```typescript
+// Component initialization (replaces onMount)
+$effect(() => {
+  console.log('Component mounted');
+  initializeComponent();
+  
+  // Cleanup (replaces onDestroy)
+  return () => {
+    console.log('Component destroyed');
+    cleanupComponent();
+  };
+});
+
+// Before/after update
+let previousCount = $state(0);
+
+$effect(() => {
+  // This runs after count changes but before DOM updates
+  console.log('Previous count:', previousCount);
+  console.log('New count:', count);
+  
+  // Store current value for next change
+  previousCount = count;
+});
+
+// After DOM update (using microtask)
+$effect(async () => {
+  // Component state updated
+  await Promise.resolve();
+  // DOM now updated, can measure elements, etc.
+  measureHeight();
+});
+```
+
+### Form Binding
+
+Form binding in Svelte 5 uses direct value binding:
+
+```svelte
+<script>
+  let formData = $state({
+    name: '',
+    email: '',
+    message: ''
+  });
+  
+  function handleSubmit() {
+    console.log('Submitting:', formData);
+    // Submit logic
+  }
+</script>
+
+<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+  <div>
+    <label for="name">Name</label>
+    <input
+      id="name"
+      type="text"
+      bind:value={formData.name}
+      required
+    />
+  </div>
+  
+  <div>
+    <label for="email">Email</label>
+    <input
+      id="email"
+      type="email"
+      bind:value={formData.email}
+      required
+    />
+  </div>
+  
+  <div>
+    <label for="message">Message</label>
+    <textarea
+      id="message"
+      bind:value={formData.message}
+      required
+    ></textarea>
+  </div>
+  
+  <button type="submit">Send</button>
+</form>
+```
+
+## Debugging and Performance Tips
+
+### Debugging Reactivity
+
+For debugging reactivity in Svelte 5:
+
+```typescript
+// Add debug logs in effects
+$effect(() => {
+  console.log(`[Debug] Value changed:`, someValue);
+});
+
+// Use labeled effects for easier debugging
+$effect(() => {
+  console.log('Cart items updated:', cart.items.length);
+  return () => console.log('Cleaning up cart effect');
+}, { label: 'cartEffect' });
+
+// Track component re-renders
+let renderCount = $state(0);
+$effect(() => {
+  renderCount++;
+  console.log(`Component rendered ${renderCount} times`);
+});
+```
+
+### Performance Optimization
+
+```typescript
+// Memoize expensive computations
+import { memoize } from './utils';
+
+const calculateTotal = memoize((items) => {
+  console.log('Calculating total...');
+  return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+});
+
+let total = $derived(calculateTotal(cart.items));
+
+// Fine-grained reactivity with sub-objects
+let user = $state({
+  profile: { name: 'John', email: 'john@example.com' },
+  preferences: { theme: 'dark', notifications: true }
+});
+
+// Only react to theme changes, not all preference changes
+let theme = $derived(user.preferences.theme);
+
+$effect(() => {
+  updateTheme(theme);
+});
+```
+
+## Reference Example: Complete Counter Component
+
+```svelte
+<script lang="ts">
+  // Counter.svelte - A complete example using Svelte 5 Runes
+  
+  // Props definition
+  interface $$Props {
+    initialValue?: number;
+    step?: number;
+    min?: number;
+    max?: number;
+    onChange?: (value: number) => void;
+  }
+  
+  let { 
+    initialValue = 0, 
+    step = 1, 
+    min = Number.MIN_SAFE_INTEGER,
+    max = Number.MAX_SAFE_INTEGER,
+    onChange 
+  } = $props<$$Props>();
+  
+  // Internal state
+  let count = $state(initialValue);
+  let lastUpdated = $state<Date | null>(null);
+  
+  // Derived values
+  let isAtMin = $derived(count <= min);
+  let isAtMax = $derived(count >= max);
+  
+  // Effects
+  $effect(() => {
+    // Update when count changes
+    lastUpdated = new Date();
+    
+    // Notify parent
+    onChange?.(count);
+  });
+  
+  // Initialize from props
+  $effect(() => {
+    count = initialValue;
+  });
+  
+  // Actions
+  function increment() {
+    if (count + step <= max) {
+      count += step;
+    }
+  }
+  
+  function decrement() {
+    if (count - step >= min) {
+      count -= step;
+    }
+  }
+  
+  function reset() {
+    count = initialValue;
+  }
+</script>
+
+<div class="counter">
+  <button 
+    onclick={decrement} 
+    disabled={isAtMin}
+    aria-label="Decrease"
+  >
+    -
+  </button>
+  
+  <span class="value">{count}</span>
+  
+  <button 
+    onclick={increment} 
+    disabled={isAtMax}
+    aria-label="Increase"
+  >
+    +
+  </button>
+  
+  <button 
+    onclick={reset}
+    aria-label="Reset"
+    class="reset"
+  >
+    Reset
+  </button>
+  
+  {#if lastUpdated}
+    <div class="updated">
+      Last updated: {lastUpdated.toLocaleTimeString()}
+    </div>
+  {/if}
+</div>
+
+<style>
+  .counter {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-family: sans-serif;
+  }
+  
+  button {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  button:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+  }
+  
+  .reset {
+    background: #ef4444;
+    margin-left: 1rem;
+  }
+  
+  .value {
+    font-size: 1.5rem;
+    min-width: 2.5rem;
+    text-align: center;
+  }
+  
+  .updated {
+    margin-left: 1rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+</style>
+```

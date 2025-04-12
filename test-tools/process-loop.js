@@ -10,7 +10,7 @@ import path from 'path';
 import config from './config.js';
 
 // For MCP interaction
-const MCPClient = await import('@modelcontextprotocol/sdk');
+const MCPClient = require('@modelcontextprotocol/sdk');
 
 const execAsync = promisify(exec);
 
