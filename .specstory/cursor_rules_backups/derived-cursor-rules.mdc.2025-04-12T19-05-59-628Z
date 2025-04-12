@@ -1,7 +1,3 @@
----
-description: Cursor rules derived by SpecStory from the project AI interaction history
-globs: *
----
 
 ## PROJECT OVERVIEW
 Band Brain Hub is a single-page, mobile-critical web application designed for band members to collaboratively manage events, tasks, notes, finances, and setlists. The application prioritizes rapid deployment, excellent UX/UI, and seamless real-time synchronization. Offline support is crucial. The application is implemented as a single-file application using Svelte 5, TypeScript, and Tailwind CSS, leveraging IndexedDB for persistence and local JSON-like data structures. Authentication is already implemented.  The application uses an internal JSON-based data layer for persistence. Data persistence is managed via local JSON-like structures within TypeScript and IndexedDB.
@@ -31,7 +27,7 @@ Svelte 5, TypeScript, Tailwind CSS, Font Awesome, uuid, IndexedDB, Vite (build t
 Rapid iterative development and deployment cycles. Prioritize features based on user needs and feedback. Use `bun run dev` for development and `bun run build` for production builds.  Use `bun run preview` for previewing production builds. A comprehensive `.gitignore` file must be used to manage ignored files and folders.  The `.gitignore` file should include entries for dependencies, build artifacts, environment variables, debug logs, IDE files, OS files, and common build artifacts and caches (see REFERENCE EXAMPLES for a sample `.gitignore` file).
 
 ## REFERENCE EXAMPLES
-- **.gitignore:**
+- **.gitignore:** (See below for content)
 
 ```
 # Dependencies
