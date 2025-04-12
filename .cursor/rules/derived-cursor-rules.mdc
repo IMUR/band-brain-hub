@@ -7,13 +7,13 @@ globs: *
 Band Brain Hub is a single-page, mobile-critical web application designed for band members to collaboratively manage events, tasks, notes, finances, and setlists. The application prioritizes rapid deployment, excellent UX/UI, and seamless real-time synchronization. Offline support is crucial. The application is implemented as a single-file application using Svelte 5, TypeScript, and Tailwind CSS, leveraging IndexedDB for persistence and local JSON-like data structures. Authentication is already implemented.  The application uses an internal JSON-based data layer for persistence. Data persistence is managed via local JSON-like structures within TypeScript and IndexedDB.
 
 ## CODE STYLE
-Consistent with standard Svelte/TypeScript best practices. Emphasis on readability and maintainability.
+Consistent with standard Svelte/TypeScript best practices. Emphasis on readability and maintainability.  Avoid JSX-style comments in Svelte components. Use standard Svelte comment syntax.
 
 ## FOLDER ORGANIZATION
-The project uses a minimized folder structure. Core application logic resides in `src/App.svelte`.  Additional files include `package.json`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js`, `tsconfig.json`, `index.html`, `src/app.css`, `src/main.ts`, and a `src/components` folder (currently empty).
+The project uses a minimized folder structure. Core application logic resides in `src/App.svelte`.  Additional files include `package.json`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js`, `tsconfig.json`, `index.html`, `src/app.css`, `src/main.ts`, and a `src/components` folder (currently empty).  A `src/data` folder may be added for storing JSON data.
 
 ## TECH STACK
-Svelte 5, TypeScript, Tailwind CSS, Font Awesome, uuid, IndexedDB, Vite (build tool), idb, tslib, @tsconfig/svelte, @sveltejs/vite-plugin-svelte, autoprefixer, postcss, Bun (package manager and Javascript runtime), Node.js (optional)
+Svelte 5, TypeScript, Tailwind CSS, Font Awesome, uuid, IndexedDB, Vite (build tool), idb, tslib, @tsconfig/svelte, @sveltejs/vite-plugin-svelte, autoprefixer, postcss, Bun (package manager and Javascript runtime), Node.js (optional), @tailwindcss/postcss
 
 ## PROJECT-SPECIFIC STANDARDS
 - All data is persisted locally using IndexedDB and managed via local JSON-like structures within TypeScript.
@@ -23,12 +23,11 @@ Svelte 5, TypeScript, Tailwind CSS, Font Awesome, uuid, IndexedDB, Vite (build t
 - Offline support is provided through IndexedDB integration.
 - Bun is the preferred package manager and Javascript runtime. Node.js is optional.  Use `bun run --bun dev` for development and `bun run --bun build` for production builds. If Bun is slow, try clearing the cache with `bun pm cache rm`.
 - The application uses an internal JSON-based data layer for persistence.
-- `tsconfig.json` and `tsconfig.node.json` must be configured correctly to avoid TypeScript errors.  The `"strict"` and `"forceConsistentCasingInFileNames"` compiler options should be enabled.
+- `tsconfig.json` and `tsconfig.node.json` must be configured correctly to avoid TypeScript errors.  The `"strict"` and `"forceConsistentCasingInFileNames"` compiler options should be enabled.  `tsconfig.node.json` is required for Vite even when using Bun.
 
 
 ## WORKFLOW & RELEASE RULES
-Rapid iterative development and deployment cycles. Prioritize features based on user needs and feedback.
-
+Rapid iterative development and deployment cycles. Prioritize features based on user needs and feedback.  Use `bun run dev:bun` for development and `bun run build:bun` for production builds.
 
 ## REFERENCE EXAMPLES
 N/A - Single file application.
@@ -50,3 +49,5 @@ Standard browser developer tools.  If Bun is slow, try clearing the cache with `
 - **DO** configure `tsconfig.json` and `tsconfig.node.json` correctly, enabling `"strict"` and `"forceConsistentCasingInFileNames"` compiler options.
 - **DON'T** use external backend services (e.g., Supabase).
 - **DON'T** over-engineer solutions; strive for simplicity.
+- **DO** use `bun run dev:bun` for development and `bun run build:bun` for production builds.
+- **DO** use standard Svelte comment syntax, avoid JSX-style comments.

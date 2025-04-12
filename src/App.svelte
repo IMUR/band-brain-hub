@@ -323,7 +323,12 @@
         <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Band Brain Hub</h1>
         <p class="text-gray-600 mb-6">Your band's digital command center</p>
       </div>
-      <form class="space-y-6" onsubmit="{event => { event.preventDefault(); handleLogin(event.target.username.value); }}">
+      <form class="space-y-6" onsubmit="{(event: SubmitEvent) => { 
+        event.preventDefault(); 
+        const form = event.target as HTMLFormElement;
+        const username = form.username.value;
+        handleLogin(username); 
+      }}">
         <div>
           <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
           <input id="username" name="username" type="text" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
@@ -338,7 +343,7 @@
   </div>
 {:else}
   <!-- Main App Layout -->
-  <div class="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 pb-16"> {/* Added pb-16 for footer */}
+  <div class="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 pb-16"> <!-- Added pb-16 for footer -->
 
     <!-- Header -->
     <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
@@ -393,14 +398,13 @@
     <!-- Bottom Navigation -->
     <footer class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg border-t border-gray-200 dark:border-gray-700">
       <nav class="flex justify-around">
-        {@const tabs: { name: Tab; icon: string; label: string }[] = [
-          { name: 'events', icon: 'fa-calendar-alt', label: 'Events' },
-          { name: 'tasks', icon: 'fa-tasks', label: 'Tasks' },
-          { name: 'notes', icon: 'fa-sticky-note', label: 'Notes' },
-          { name: 'budget', icon: 'fa-dollar-sign', label: 'Budget' },
-          { name: 'setlists', icon: 'fa-music', label: 'Setlists' },
-        ]}
-        {#each tabs as tab}
+        {#each [
+          { name: 'events' as Tab, icon: 'fa-calendar-alt', label: 'Events' },
+          { name: 'tasks' as Tab, icon: 'fa-tasks', label: 'Tasks' },
+          { name: 'notes' as Tab, icon: 'fa-sticky-note', label: 'Notes' },
+          { name: 'budget' as Tab, icon: 'fa-dollar-sign', label: 'Budget' },
+          { name: 'setlists' as Tab, icon: 'fa-music', label: 'Setlists' }
+        ] as tab}
           {@const isActive = activeTab === tab.name}
           <button
             onclick={() => { activeTab = tab.name; }}
