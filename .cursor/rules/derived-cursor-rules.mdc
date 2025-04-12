@@ -4,13 +4,13 @@ globs: *
 ---
 
 ## PROJECT OVERVIEW
-Band Brain Hub is a single-page, mobile-critical web application designed for band members to collaboratively manage events, tasks, notes, finances, and setlists. The application prioritizes rapid deployment, excellent UX/UI, and seamless real-time synchronization. Offline support is crucial. The application is implemented as a single-file application using Svelte 5, TypeScript, and Tailwind CSS, leveraging IndexedDB for persistence and local JSON-like data structures. Authentication is already implemented.
+Band Brain Hub is a single-page, mobile-critical web application designed for band members to collaboratively manage events, tasks, notes, finances, and setlists. The application prioritizes rapid deployment, excellent UX/UI, and seamless real-time synchronization. Offline support is crucial. The application is implemented as a single-file application using Svelte 5, TypeScript, and Tailwind CSS, leveraging IndexedDB for persistence and local JSON-like data structures. Authentication is already implemented.  The application uses an internal JSON-based data layer for persistence.
 
 ## CODE STYLE
 Consistent with standard Svelte/TypeScript best practices. Emphasis on readability and maintainability.
 
 ## FOLDER ORGANIZATION
-Minimized to a ludicrous degree;  `src/App.svelte` contains the core application logic. Additional files include `package.json`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js`, `tsconfig.json`, `index.html`, and `src/app.css`.
+The project uses a minimized folder structure. Core application logic resides in `src/App.svelte`.  Additional files include `package.json`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js`, `tsconfig.json`, `index.html`, `src/app.css`, `src/main.ts`, and a `src/components` folder (currently empty).
 
 ## TECH STACK
 Svelte 5, TypeScript, Tailwind CSS, Font Awesome, uuid, IndexedDB, Vite (build tool), idb, tslib, @tsconfig/svelte, @sveltejs/vite-plugin-svelte, autoprefixer, postcss
@@ -22,6 +22,7 @@ Svelte 5, TypeScript, Tailwind CSS, Font Awesome, uuid, IndexedDB, Vite (build t
 - Reactive, real-time updates are implemented using Svelte 5 runes.
 - Offline support is provided through IndexedDB integration.
 - A build tool (Vite) is required for development.
+- The application uses an internal JSON-based data layer for persistence.
 
 
 ## WORKFLOW & RELEASE RULES
@@ -43,5 +44,6 @@ Standard browser developer tools.
 - **DO** maintain a consistent and visually appealing design.
 - **DO** use clear and concise language in all interactions.
 - **DO** use Vite or a similar build tool for development.
+- **DO** use an internal JSON-based data layer for persistence.
 - **DON'T** use external backend services (e.g., Supabase).
 - **DON'T** over-engineer solutions; strive for simplicity.
