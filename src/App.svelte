@@ -72,39 +72,47 @@
   const DB_NAME = 'band-brain-hub-db';
   const DB_VERSION = 1;
 
+  // Initialize database on component mount
   async function initDB() {
-    db = await openDB(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains('users')) {
-          db.createObjectStore('users', { keyPath: 'id' });
-        }
-        if (!db.objectStoreNames.contains('events')) {
-          const store = db.createObjectStore('events', { keyPath: 'id' });
-          store.createIndex('date', 'date'); // Index for sorting by date
-        }
-        if (!db.objectStoreNames.contains('tasks')) {
-          db.createObjectStore('tasks', { keyPath: 'id' });
-          // Add indexes if needed, e.g., store.createIndex('completed', 'completed');
-        }
-        if (!db.objectStoreNames.contains('notes')) {
-          const store = db.createObjectStore('notes', { keyPath: 'id' });
-          store.createIndex('createdAt', 'createdAt');
-        }
-        if (!db.objectStoreNames.contains('transactions')) {
-          const store = db.createObjectStore('transactions', { keyPath: 'id' });
-          store.createIndex('date', 'date');
-        }
-        if (!db.objectStoreNames.contains('setlists')) {
-          db.createObjectStore('setlists', { keyPath: 'id' });
-        }
-      },
-    });
-    console.log('Database initialized:', db);
+    try {
+      db = await openDB(DB_NAME, DB_VERSION, {
+        upgrade(db) {
+          if (!db.objectStoreNames.contains('users')) {
+            db.createObjectStore('users', { keyPath: 'id' });
+          }
+          if (!db.objectStoreNames.contains('events')) {
+            const store = db.createObjectStore('events', { keyPath: 'id' });
+            store.createIndex('date', 'date'); // Index for sorting by date
+          }
+          if (!db.objectStoreNames.contains('tasks')) {
+            db.createObjectStore('tasks', { keyPath: 'id' });
+            // Add indexes if needed, e.g., store.createIndex('completed', 'completed');
+          }
+          if (!db.objectStoreNames.contains('notes')) {
+            const store = db.createObjectStore('notes', { keyPath: 'id' });
+            store.createIndex('createdAt', 'createdAt');
+          }
+          if (!db.objectStoreNames.contains('transactions')) {
+            const store = db.createObjectStore('transactions', { keyPath: 'id' });
+            store.createIndex('date', 'date');
+          }
+          if (!db.objectStoreNames.contains('setlists')) {
+            db.createObjectStore('setlists', { keyPath: 'id' });
+          }
+        },
+      });
+      console.log('Database initialized:', db);
+      
+      // Load user from local storage after DB is initialized
+      loadUserFromLocalStorage();
+      
+    } catch (error) {
+      console.error('Failed to initialize database:', error);
+    }
   }
 
-  $effect(() => {
-    initDB();
-  });
+  // Call initDB immediately on component creation
+  initDB();
 
   // === Generic Data Access Functions ===
   async function getAll<T>(storeName: StoreName): Promise<T[]> {
@@ -133,19 +141,21 @@
   let isAuthenticated = $state(false);
   let currentUser = $state<User | null>(null);
 
-  // Check local storage on initial load
-  $effect(() => {
+  // Function to load user from localStorage
+  function loadUserFromLocalStorage() {
     const storedUser = localStorage.getItem('bandbrainUser');
     if (storedUser) {
       try {
         currentUser = JSON.parse(storedUser);
         isAuthenticated = true;
+        // Load initial data when user is authenticated
+        loadAllData();
       } catch (e) {
         console.error("Error parsing stored user:", e);
         localStorage.removeItem('bandbrainUser');
       }
     }
-  });
+  }
 
   function handleLogin(username: string) {
     // Simple demo login: finds or creates user
@@ -179,11 +189,11 @@
   let setlists = $state<Setlist[]>([]);
   let users = $state<User[]>([]); // Potentially store band members here
 
-  // Load initial data when DB is ready and user is authenticated
-  $effect(() => {
-    async function loadAllData() {
-      if (db && isAuthenticated) {
-        console.log('Loading data...');
+  // Load all data function
+  async function loadAllData() {
+    if (db && isAuthenticated) {
+      console.log('Loading data...');
+      try {
         events = await getAll<Event>('events');
         tasks = await getAll<Task>('tasks');
         notes = await getAll<Note>('notes');
@@ -191,9 +201,22 @@
         setlists = await getAll<Setlist>('setlists');
         users = await getAll<User>('users');
         console.log('Data loaded:', { events, tasks, notes, transactions, setlists, users });
+        console.log('Database status:', db ? 'Connected' : 'Not connected');
+        console.log('Authentication status:', isAuthenticated ? 'Authenticated' : 'Not authenticated');
+        if (currentUser) {
+          console.log('Current user:', currentUser.name);
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
       }
     }
-    loadAllData();
+  }
+
+  // Create a reactive dependency on db and isAuthenticated
+  $effect(() => {
+    if (db && isAuthenticated) {
+      loadAllData();
+    }
   });
 
   // === CRUD Operations (Using Generic Functions) ===

@@ -1,7 +1,3 @@
----
-description: Cursor rules derived by SpecStory from the project AI interaction history
-globs: *
----
 
 ## PROJECT OVERVIEW
 Band Brain Hub is a single-page, mobile-critical web application designed for band members to collaboratively manage events, tasks, notes, finances, and setlists. The application prioritizes rapid deployment, excellent UX/UI, and seamless real-time synchronization. Offline support is crucial. The application is implemented as a single-file application using Svelte 5, TypeScript, and Tailwind CSS, leveraging IndexedDB for persistence and local JSON-like data structures. Authentication is already implemented.  The application uses an internal JSON-based data layer for persistence. Data persistence is managed via local JSON-like structures within TypeScript and IndexedDB.
@@ -28,7 +24,7 @@ Svelte 5, TypeScript, Tailwind CSS, Font Awesome, uuid, IndexedDB, Vite (build t
 
 
 ## WORKFLOW & RELEASE RULES
-Rapid iterative development and deployment cycles. Prioritize features based on user needs and feedback. Use `bun run dev` for development and `bun run build` for production builds.  Use `bun run preview` for previewing production builds. Use `bun run dev` for development and `bun run build` for production builds.
+Rapid iterative development and deployment cycles. Prioritize features based on user needs and feedback. Use `bun run dev` for development and `bun run build` for production builds.  Use `bun run preview` for previewing production builds.
 
 ## REFERENCE EXAMPLES
 N/A - Single file application.
@@ -38,7 +34,7 @@ N/A - Single file application.
 All documentation is embedded within the `app.svelte` file (post-build) through comments and type definitions.
 
 ## DEBUGGING
-Standard browser developer tools.  If Bun is slow, try clearing the cache with `bun pm cache rm`. Use `bun run dev` for development.  Use browser developer tools. Address "effect_orphan" errors by ensuring `$effect` runes are used correctly within component lifecycles, avoiding async operations directly within them.  Ensure proper error handling within `$effect` blocks. Address "component_api_invalid_new" errors by setting the `compatibility.componentApi` compiler option to `4` in `tsconfig.json`.  Avoid using `new` keyword to instantiate Svelte components in Svelte 5. Use the functional approach instead.  Address "effect_orphan" errors by ensuring asynchronous operations within `$effect` blocks are handled correctly.
+Standard browser developer tools.  If Bun is slow, try clearing the cache with `bun pm cache rm`. Use `bun run dev` for development.  Use browser developer tools. Address "effect_orphan" errors by ensuring `$effect` runes are used correctly within component lifecycles, avoiding async operations directly within them.  Ensure proper error handling within `$effect` blocks. Address "component_api_invalid_new" errors by setting the `compatibility.componentApi` compiler option to `4` in `tsconfig.json`.
 
 ## FINAL DOs AND DON'Ts
 - **DO** prioritize simplicity and ease of use.
@@ -52,6 +48,3 @@ Standard browser developer tools.  If Bun is slow, try clearing the cache with `
 - **DON'T** over-engineer solutions; strive for simplicity.
 - **DO** use `bun run dev` for development and `bun run build` for production builds.  Use `bun run preview` for previewing production builds.
 - **DO** use standard Svelte comment syntax, avoid JSX-style comments.
-- **DO** ensure that asynchronous operations within `$effect` blocks are handled correctly to avoid "effect_orphan" errors.
-- **DO** use the functional approach (not `new`) to instantiate Svelte components in Svelte 5.
-- **DO** configure `tailwind.config.js` to include `"./src/**/*.{js,ts,jsx,tsx,svelte}"` in the `content` array.
