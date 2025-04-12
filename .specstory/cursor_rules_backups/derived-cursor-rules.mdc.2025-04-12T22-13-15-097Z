@@ -1,0 +1,49 @@
+
+## PROJECT OVERVIEW
+
+Band Brain Hub: A collaborative single-page web application for band management. Focus on rapid deployment, excellent UX/UI, and seamless mobile experience.  Real-time synchronization and offline support are no longer critical. New approach prioritizes simplicity and a single-file architecture.  The application should be fun and easy to use, but synergize effectively.  Authorized user access only.
+
+## CODE STYLE
+
+React, Tailwind CSS, Babel, uuid.  Uses a single `app.js` file.
+
+## FOLDER ORGANIZATION
+
+The project uses a single-file architecture (`app.js`).  Previous folder structure is obsolete.
+
+## TECH STACK
+
+React 18, React DOM 18, @babel/standalone, Tailwind CSS 2.2.19, Font Awesome 6.0.0-beta3, uuid 8.3.2.  Data persistence via localStorage.
+
+## PROJECT-SPECIFIC STANDARDS
+
+- Prioritize intuitive UX/UI design, considering the needs of non-technical band members.
+- All functionality must be contained within a single `app.js` file.
+- No external backend (e.g., Supabase) will be used. Data will be managed within the single file using localStorage.
+- Comprehensive error handling and loading states are essential.
+
+## WORKFLOW & RELEASE RULES
+
+Single file deployment. Workflow to be defined.
+
+## REFERENCE EXAMPLES
+
+To be added as the project progresses.  See generated code for initial examples.
+
+## PROJECT DOCUMENTATION & CONTEXT SYSTEM
+
+Type definitions embedded within `app.js` file. Further documentation to be added as needed.
+
+## DEBUGGING
+
+Debugging strategies to be defined based on the single-file application.
+
+## FINAL DOs AND DON'Ts
+
+- **DO:** Prioritize simplicity and ease of use in the UI design.
+- **DO:** Design with an intuitive UX/UI that is accessible to non-technical users.
+- **DO:** Ensure consistent error handling and loading states throughout the application.
+- **DO:** Maintain all application code within a single `app.js` file.
+- **DO:** Use localStorage for managing data.
+- **DON'T:** Use any external backend services.
+- **DON'T:** Rely on local state for data persistence (unless integrated directly within the single file using localStorage).
