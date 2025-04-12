@@ -1,0 +1,56 @@
+
+## PROJECT OVERVIEW
+
+Band Brain Hub: A collaborative single-page web application for band management. Focus on rapid deployment, excellent UX/UI, and seamless mobile experience. Offline support is handled via a service worker and PWA features. New approach prioritizes simplicity and a single-file architecture. The application should be fun and easy to use, but synergize effectively. Authorized user access only, implemented via a simple, manually configurable password.
+
+## CODE STYLE
+
+React, Tailwind CSS, Babel, uuid. Uses a single `app.js` file and integrated JSON-like data persistence within the single file. TypeScript is no longer used.
+
+## FOLDER ORGANIZATION
+
+The project uses a single-file architecture (`app.js`, `index.html`, `manifest.json`, `service-worker.js`). Previous folder structure is obsolete.
+
+## TECH STACK
+
+React 18, React DOM 18, @babel/standalone, Tailwind CSS 2.2.19, Font Awesome 6.0.0-beta3, uuid 8.3.2. Data persistence via localStorage. Added support for PWA functionality.  Service Worker implemented for offline capabilities.
+
+## PROJECT-SPECIFIC STANDARDS
+
+- Prioritize intuitive UX/UI design, considering the needs of non-technical band members.
+- All functionality must be contained within `app.js`, `index.html`, `manifest.json`, and `service-worker.js`.
+- No external backend (e.g., Supabase) will be used. Data will be managed within the single files using localStorage.
+- Comprehensive error handling and loading states are essential.
+- Utilize button-to-input transformations instead of modals or popups where feasible.
+- Implement offline support via a service worker and PWA features.
+- Implement data export/import functionality for backups and resets.
+
+
+## WORKFLOW & RELEASE RULES
+
+Single file deployment. Workflow includes data export/import functionality for backups and resets.
+
+## REFERENCE EXAMPLES
+
+See generated code within the 2025-04-12_15-36-band-brain-hub-single-file-migration-plan.md document for initial examples.
+
+## PROJECT DOCUMENTATION & CONTEXT SYSTEM
+
+Type definitions embedded within `app.js` file. Further documentation to be added as needed within the single files. `manifest.json` file added to enable PWA features.  App Configuration is now manually configurable within `app.js`.
+
+## DEBUGGING
+
+Debugging strategies will focus on the single-file application, leveraging browser developer tools. Data export/import functionality aids in troubleshooting.
+
+## FINAL DOs AND DON'Ts
+
+- **DO:** Prioritize simplicity and ease of use in the UI design.
+- **DO:** Design with an intuitive UX/UI that is accessible to non-technical users.
+- **DO:** Ensure consistent error handling and loading states throughout the application.
+- **DO:** Maintain all application code within `app.js`, `index.html`, `manifest.json`, and `service-worker.js`.
+- **DO:** Use localStorage for managing data.
+- **DO:** Implement offline functionality using a service worker.
+- **DO:** Use button-to-input transformations instead of modals or popups where appropriate.
+- **DO:** Implement data export/import functionality.
+- **DON'T:** Use any external backend services.
+- **DON'T:** Rely on local state for data persistence (unless integrated directly within the single files using localStorage).
