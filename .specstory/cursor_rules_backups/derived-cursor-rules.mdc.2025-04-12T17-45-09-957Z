@@ -1,0 +1,47 @@
+
+## PROJECT OVERVIEW
+Band Brain Hub is a single-page, mobile-critical web application designed for band members to collaboratively manage events, tasks, notes, finances, and setlists. The application prioritizes rapid deployment, excellent UX/UI, and seamless real-time synchronization. Offline support is crucial. The application is implemented as a single-file application using Svelte 5, TypeScript, and Tailwind CSS, leveraging IndexedDB for persistence and local JSON-like data structures. Authentication is already implemented.  The application uses an internal JSON-based data layer for persistence. Data persistence is managed via local JSON-like structures within TypeScript and IndexedDB.
+
+## CODE STYLE
+Consistent with standard Svelte/TypeScript best practices. Emphasis on readability and maintainability.
+
+## FOLDER ORGANIZATION
+The project uses a minimized folder structure. Core application logic resides in `src/App.svelte`.  Additional files include `package.json`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js`, `tsconfig.json`, `index.html`, `src/app.css`, `src/main.ts`, and a `src/components` folder (currently empty).
+
+## TECH STACK
+Svelte 5, TypeScript, Tailwind CSS, Font Awesome, uuid, IndexedDB, Vite (build tool), idb, tslib, @tsconfig/svelte, @sveltejs/vite-plugin-svelte, autoprefixer, postcss, Bun (package manager and Javascript runtime), Node.js (optional)
+
+## PROJECT-SPECIFIC STANDARDS
+- All data is persisted locally using IndexedDB and managed via local JSON-like structures within TypeScript.
+- The application is designed as a single-file application for ease of deployment and maintenance (using Vite for development).
+- UI should be intuitive for users with varying levels of technical expertise.  The application should maintain a conversational tone in interactions with users.
+- Reactive, real-time updates are implemented using Svelte 5 runes.
+- Offline support is provided through IndexedDB integration.
+- Bun is the preferred package manager and Javascript runtime. Node.js is optional.
+- The application uses an internal JSON-based data layer for persistence.
+- `tsconfig.json` and `tsconfig.node.json` must be configured correctly to avoid TypeScript errors.  The `"strict"` and `"forceConsistentCasingInFileNames"` compiler options should be enabled.
+
+
+## WORKFLOW & RELEASE RULES
+Rapid iterative development and deployment cycles. Prioritize features based on user needs and feedback.  Use `bun run --bun dev` for development and `bun run --bun build` for production builds.  If Bun is slow, try clearing the cache with `bun pm cache rm`.
+
+## REFERENCE EXAMPLES
+N/A - Single file application.
+
+
+## PROJECT DOCUMENTATION & CONTEXT SYSTEM
+All documentation is embedded within the `app.svelte` file (post-build) through comments and type definitions.
+
+## DEBUGGING
+Standard browser developer tools.  If Bun is slow, try clearing the cache with `bun pm cache rm`.
+
+## FINAL DOs AND DON'Ts
+- **DO** prioritize simplicity and ease of use.
+- **DO** ensure the application is mobile-friendly and responsive.
+- **DO** maintain a consistent and visually appealing design.
+- **DO** use clear and concise language in all interactions.
+- **DO** use Bun as the package manager and Javascript runtime. Node.js is optional.
+- **DO** use an internal JSON-based data layer for persistence.
+- **DO** configure `tsconfig.json` and `tsconfig.node.json` correctly, enabling `"strict"` and `"forceConsistentCasingInFileNames"` compiler options.
+- **DON'T** use external backend services (e.g., Supabase).
+- **DON'T** over-engineer solutions; strive for simplicity.
